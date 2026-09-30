@@ -22,12 +22,12 @@ resource "aws_vpc" "vpc_prod" {
   cidr_block           = "10.0.0.0/22"
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags = { Name = "VPC-EscolarOnline-Produccion" }
+  tags = { Name = "VPC-FreshBox-Produccion" }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc_prod.id
-  tags = { Name = "IGW-EscolarOnline" }
+  tags = { Name = "IGW-FreshBox" }
 }
 
 resource "aws_subnet" "sub_public_a" {
@@ -83,13 +83,13 @@ resource "aws_subnet" "sub_private_db_b" {
 # ==========================================
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
-  tags = { Name = "EIP-NAT-EscolarOnline" }
+  tags = { Name = "EIP-NAT-FreshBox" }
 }
 
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.sub_public_a.id
-  tags = { Name = "NAT-GW-EscolarOnline" }
+  tags = { Name = "NAT-GW-FreshBox" }
   depends_on = [aws_internet_gateway.igw]
 }
 
@@ -216,11 +216,11 @@ resource "aws_security_group" "sg_db" {
 # 4. BALANCEADOR DE CARGA
 # ==========================================
 resource "aws_lb" "alb" {
-  name               = "escolaronline-alb-prod"
+  name               = "freshbox-alb-prod"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_alb.id]
   subnets            = [aws_subnet.sub_public_a.id, aws_subnet.sub_public_b.id]
-  tags = { Name = "ALB-EscolarOnline-Prod" }
+  tags = { Name = "ALB-FreshBox-Prod" }
 }
 
 resource "aws_lb_target_group" "tg_front" {
@@ -299,7 +299,7 @@ resource "aws_instance" "database" {
 # 6. CAPA DE APLICACIÓN
 # ==========================================
 resource "aws_launch_template" "app_template" {
-  name_prefix   = "escolaronline-prod-tpl-"
+  name_prefix   = "freshbox-prod-tpl-"
   image_id      = data.aws_ami.amazon_linux_arm64.id
   instance_type = "t4g.small"
 
@@ -349,7 +349,7 @@ resource "aws_launch_template" "app_template" {
 }
 
 resource "aws_autoscaling_group" "app_asg" {
-  name                = "asg-escolaronline-prod"
+  name                = "asg-freshbox-prod"
   vpc_zone_identifier = [aws_subnet.sub_private_app_a.id, aws_subnet.sub_private_app_b.id]
   target_group_arns   = [aws_lb_target_group.tg_front.arn]
 
@@ -369,11 +369,11 @@ resource "aws_autoscaling_group" "app_asg" {
 # 7. AWS BACKUP (Contingencia BD)
 # ==========================================
 resource "aws_backup_vault" "backup_vault" {
-  name = "vault-escolaronline"
+  name = "vault-freshbox"
 }
 
 resource "aws_backup_plan" "backup_plan" {
-  name = "plan-escolaronline-bd"
+  name = "plan-freshbox-bd"
 
   rule {
     rule_name         = "respaldo-diario"
