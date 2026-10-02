@@ -319,7 +319,7 @@ resource "aws_launch_template" "app_template" {
   user_data = base64encode(<<-EOF
               #!/bin/bash
               dnf update -y
-              dnf install -y docker git
+              dnf install -y docker git mariadb105 nc
               
               mkdir -p /usr/local/lib/docker/cli-plugins
               curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-aarch64 -o /usr/local/lib/docker/cli-plugins/docker-compose
