@@ -280,7 +280,7 @@ resource "aws_instance" "database" {
                 --restart always \
                 -p 3306:3306 \
                 -e MYSQL_ROOT_PASSWORD=root123 \
-                -e MYSQL_DATABASE=escolar_online \
+                -e MYSQL_DATABASE=freshbox_db \
                 -e MYSQL_USER=alumno \
                 -e MYSQL_PASSWORD=alumno123 \
                 -v "/home/ec2-user/app/1.6.4 desarrolloApp-ACT1.6/init.sql":/docker-entrypoint-initdb.d/init.sql \
